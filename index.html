@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>PMPI 2026 - Centro de Operações</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: #0b0e14;
+            color: #e0e6f0;
+            padding: 16px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 950px;
+            width: 100%;
+        }
+
+        /* CABEÇALHO */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f5b301;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f5b301;
+            letter-spacing: 1px;
+        }
+        .header h1 small {
+            font-size: 0.7rem;
+            color: #8892a8;
+            display: block;
+            font-weight: 400;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .countdown {
+            background: #1c232e;
+            padding: 6px 14px;
+            border-radius: 40px;
+            border: 1px solid #f5b30155;
+            text-align: center;
+        }
+        .countdown .dias {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #f5b301;
+            line-height: 1;
+        }
+        .countdown .label {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            color: #8892a8;
+        }
+
+        /* CARDS GERAIS */
+        .card {
+            background: #141b24;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+            border: 1px solid #26303e;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8892a8;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #26303e;
+            padding-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .card-title .badge {
+            background: #f5b301;
+            color: #0b0e14;
+            font-weight: 700;
+            font-size: 0.6rem;
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        /* FOCO DO DIA (DESTAQUE) */
+        .focus-today {
+            background: #1f281f;
+            border-left: 6px solid #2ecc71;
+            padding: 14px 18px;
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .focus-today .dia-semana {
+            font-weight: 700;
+            color: #2ecc71;
+            font-size: 1.1rem;
+        }
+        .focus-today .assunto-dia {
+            font-weight: 500;
+            color: #e0e6f0;
+            font-size: 0.95rem;
+        }
+        .focus-today .assunto-dia small {
+            color: #8892a8;
+            font-weight: 400;
+            font-size: 0.75rem;
+            display: block;
+        }
+
+        /* TÉCNICAS + TIMER */
+        .tecnicas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 750px) {
+            .tecnicas-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 500px) {
+            .tecnicas-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tec-item {
+            background: #1c232e;
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tec-item:hover {
+            border-color: #f5b30155;
+        }
+        .tec-item h4 {
+            color: #f5b301;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tec-item .desc {
+            font-size: 0.75rem;
+            color: #b0bcca;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+            margin-top: 0;
+        }
+        .tec-item.active .desc {
+            max-height: 200px;
+            opacity: 1;
+            margin-top: 8px;
+        }
+        .tec-item.active {
+            border-color: #f5b301;
+            background: #1f281f;
+        }
+
+        .timer-area {
+            background: #0f141c;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-top: 6px;
+            border: 1px solid #26303e;
+        }
+        .timer-area .time {
+            font-size: 3rem;
+            font-weight: 800;
+            font-family: monospace;
+            color: #f5b301;
+            letter-spacing: 4px;
+        }
+        .timer-area .controls-timer {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .timer-area .controls-timer button {
+            background: #2a3647;
+            border: none;
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .timer-area .controls-timer button:active {
+            transform: scale(0.95);
+            background: #f5b301;
+            color: #0b0e14;
+        }
+        .timer-area .controls-timer button.tipo {
+            background: #1c232e;
+            border: 1px solid #26303e;
+        }
+        .timer-area .controls-timer button.tipo.active-mode {
+            background: #f5b301;
+            color: #0b0e14;
+            border-color: #f5b301;
+        }
+
+        /* SORTEIO */
+        .sorteio-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+            background: #1c232e;
+            padding: 10px 16px;
+            border-radius: 12px;
+        }
+        .sorteio-area button {
+            background: #f5b301;
+            border: none;
+            color: #0b0e14;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .sorteio-area button:active {
+            transform: scale(0.95);
+        }
+        .sorteio-area .result {
+            color: #b0bcca;
+            font-size: 0.9rem;
+        }
+        .sorteio-area .result strong {
+            color: #f5b301;
+        }
+
+        /* PLANO DE ESTUDOS - ABAS */
+        .tabs-nav {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: #f5b301 #1c232e;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs-nav::-webkit-scrollbar {
+            height: 4px;
+        }
+        .tabs-nav::-webkit-scrollbar-thumb {
+            background: #f5b301;
+            border-radius: 8px;
+        }
+
+        .tab-btn {
+            background: #1c232e;
+            border: 1px solid #26303e;
+            color: #8892a8;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.15s;
+            flex-shrink: 0;
+        }
+        .tab-btn.active {
+            background: #f5b301;
+            border-color: #f5b301;
+            color: #0b0e14;
+            box-shadow: 0 0 15px rgba(245, 179, 1, 0.3);
+        }
+        .tab-btn:active {
+            transform: scale(0.95);
+        }
+
+        .tab-panel {
+            display: none;
+            animation: fadeUp 0.3s ease;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .semana-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 6px;
+        }
+        @media (max-width: 700px) {
+            .semana-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        @media (max-width: 500px) {
+            .semana-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .day-card {
+            background: #1c232e;
+            border-radius: 10px;
+            padding: 10px 8px;
+            border-left: 3px solid #f5b301;
+            min-height: 80px;
+        }
+        .day-card .dia {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            color: #f5b301;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .day-card .assunto {
+            font-size: 0.65rem;
+            line-height: 1.4;
+            margin-top: 4px;
+            color: #b0bcca;
+        }
+        .day-card .assunto strong {
+            color: #e0e6f0;
+            font-weight: 600;
+        }
+        .day-card.domingo {
+            border-left-color: #ff4444;
+            background: #1f1a1a;
+        }
+        .day-card.domingo .dia {
+            color: #ff4444;
+        }
+        .day-card.sabado {
+            border-left-color: #44aaff;
+            background: #1a1f2a;
+        }
+        .day-card.sabado .dia {
+            color: #44aaff;
+        }
+        .semana-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #f5b301;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .semana-label small {
+            font-weight: 400;
+            color: #8892a8;
+            font-size: 0.7rem;
+        }
+
+        /* FOCO A/C */
+        .foco-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .foco-item {
+            background: #1c232e;
+            padding: 12px;
+            border-radius: 12px;
+            border-left: 4px solid #f5b301;
+        }
+        .foco-item h4 {
+            color: #f5b301;
+            font-size: 0.9rem;
+        }
+        .foco-item ul {
+            list-style: none;
+            font-size: 0.8rem;
+            margin-top: 6px;
+            color: #b0bcca;
+        }
+        .foco-item ul li::before {
+            content: "⚡ ";
+            color: #f5b301;
+        }
+        @media (max-width: 550px) {
+            .foco-grid {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .header-right {
+                justify-content: space-between;
+            }
+        }
+
+        /* CHECKLIST */
+        .checklist-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #1c232e;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid transparent;
+        }
+        .check-item:hover {
+            border-color: #f5b30155;
+        }
+        .check-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: #f5b301;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .check-item .info {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .check-item .info small {
+            display: block;
+            font-weight: 400;
+            color: #8892a8;
+            font-size: 0.7rem;
+        }
+        .check-item.done {
+            opacity: 0.7;
+        }
+        .check-item.done .info {
+            text-decoration: line-through;
+            color: #8892a8;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: #1c232e;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f5b301, #ff8c00);
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #8892a8;
+        }
+
+        /* CONTADORES */
+        .quest-counter {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+        .quest-box {
+            flex: 1;
+            min-width: 120px;
+            background: #1c232e;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+        .quest-box label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #8892a8;
+        }
+        .quest-box .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f5b301;
+        }
+        .quest-box .controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        .quest-box .controls button {
+            background: #2a3647;
+            border: none;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .quest-box .controls button:active {
+            transform: scale(0.9);
+            background: #f5b301;
+            color: #0b0e14;
+        }
+
+        /* METAS */
+        .meta-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-meta {
+            background: #1c232e;
+            border: 1px solid #26303e;
+            color: #e0e6f0;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-meta.active {
+            background: #f5b301;
+            border-color: #f5b301;
+            color: #0b0e14;
+        }
+        .btn-meta:active {
+            transform: scale(0.95);
+        }
+
+        .quote-box {
+            background: #1c232e;
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 6px solid #f5b301;
+            font-style: italic;
+            color: #b0bcca;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        .quote-box span {
+            display: block;
+            margin-top: 6px;
+            font-style: normal;
+            font-weight: 700;
+            color: #f5b301;
+        }
+
+        .footer {
+            text-align: center;
+            color: #2a3647;
+            font-size: 0.7rem;
+            padding: 20px 0 10px 0;
+            border-top: 1px solid #1c232e;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- CABEÇALHO -->
+        <div class="header">
+            <h1>
+                🚔 PMPI 2026
+                <small>Centro de Operações do Guerreiro</small>
+            </h1>
+            <div class="header-right">
+                <div class="countdown">
+                    <div class="dias" id="countdownDias">--</div>
+                    <div class="label">Dias para a Prova</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOCO DO DIA (DINÂMICO) -->
+        <div class="card" id="focoDiaCard">
+            <div class="card-title">📌 FOCO DO DIA <span class="badge">Prioridade Máxima</span></div>
+            <div class="focus-today" id="focusTodayContent">
+                <div>
+                    <div class="dia-semana" id="diaSemana">--</div>
+                    <div class="assunto-dia" id="assuntoDia">Carregando seu plano de hoje...</div>
+                </div>
+                <div style="font-size:0.8rem; color:#8892a8;">
+                    <span id="semanaAtualLabel">Semana 1</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TÉCNICAS DE ESTUDO + TIMER + SORTEIO -->
+        <div class="card" id="tecnicas">
+            <div class="card-title">🧠 Técnicas de Estudo (Manual do Guerreiro) <span class="badge">Clique para expandir</span></div>
+            
+            <div class="tecnicas-grid" id="tecnicasGrid">
+                <div class="tec-item" onclick="toggleTecnica(this)">
+                    <h4>⏳ Pomodoro (25/5)</h4>
+                    <div class="desc">Foque 25 minutos direto na matéria, descanse 5. Como sua concentração é baixa à noite, isso evita a fadiga. Use o timer abaixo!</div>
+                </div>
+                <div class="tec-item" onclick="toggleTecnica(this)">
+                    <h4>🔁 Revisão Ativa</h4>
+                    <div class="desc">Ao ler a lei seca, faça perguntas em voz alta: "O que isso significa? Quando se aplica?". Responder ativa a memória muito mais que reler.</div>
+                </div>
+                <div class="tec-item" onclick="toggleTecnica(this)">
+                    <h4>🥗 Revisão Espaçada (Almoço)</h4>
+                    <div class="desc">No horário de almoço, resolva 10-15 questões da matéria que você estudou na NOITE ANTERIOR. É a chave para fixar o conteúdo.</div>
+                </div>
+                <div class="tec-item" onclick="toggleTecnica(this)">
+                    <h4>🔄 Engenharia Reversa</h4>
+                    <div class="desc">Vá direto para as questões antes de ler a teoria. Errar na questão te ensina o que é realmente importante e acelera o aprendizado.</div>
+                </div>
+                <div class="tec-item" onclick="toggleTecnica(this)">
+                    <h4>🗺️ Mapas Mentais</h4>
+                    <div class="desc">Desenhe esquemas ligando artigos (ex: Art. 144 CF -> Polícias -> Funções). Transforme a lei seca em imagens para memorizar rapidamente.</div>
+                </div>
+                <div class="tec-item" onclick="toggleTecnica(this)">
+                    <h4>📓 Caderno de Erros</h4>
+                    <div class="desc">Anote a questão que errou, o motivo e a correção. Revise esse caderno TODOS OS SÁBADOS. É seu mapa dos pontos fracos.</div>
+                </div>
+            </div>
+
+            <!-- TIMER POMODORO -->
+            <div class="timer-area">
+                <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 8px;">
+                    <button class="tipo active-mode" id="btnFoco" onclick="setTimerMode('foco')">🎯 Foco (25min)</button>
+                    <button class="tipo" id="btnPausa" onclick="setTimerMode('pausa')">☕ Pausa (5min)</button>
+                </div>
+                <div class="time" id="timerDisplay">25:00</div>
+                <div class="controls-timer">
+                    <button onclick="startTimer()">▶ Iniciar</button>
+                    <button onclick="pauseTimer()">⏸️ Pausar</button>
+                    <button onclick="resetTimer()">⏹️ Resetar</button>
+                </div>
+            </div>
+
+            <!-- SORTEIO DE TEMA -->
+            <div class="sorteio-area">
+                <button onclick="sortearTema()">🎲 SORTEAR TEMA</button>
+                <div class="result" id="sorteioResult">Clique no botão para decidir o que revisar agora!</div>
+            </div>
+        </div>
+
+        <!-- PLANO DE ESTUDOS (SEMANAS) -->
+        <div class="card">
+            <div class="card-title">📚 Mapa de Estudos Semanal <span class="badge">Clique na semana</span></div>
+            <div class="tabs-nav" id="tabNav"></div>
+            <div id="tabContentContainer"></div>
+        </div>
+
+        <!-- FOCO A/C -->
+        <div class="card">
+            <div class="card-title">🎯 Ataque às suas dificuldades <span class="badge">A e C</span></div>
+            <div class="foco-grid">
+                <div class="foco-item">
+                    <h4>📘 Português (A)</h4>
+                    <ul>
+                        <li>Crase: regras básicas + casos facultativos</li>
+                        <li>Interpretação: ideia central do texto</li>
+                        <li>Regência Verbal e Nominal</li>
+                        <li>Revisar 10 questões por dia (almoço)</li>
+                    </ul>
+                </div>
+                <div class="foco-item">
+                    <h4>⚖️ Direito (C)</h4>
+                    <ul>
+                        <li>Art. 144 CF (Segurança Pública) - DECORE!</li>
+                        <li>Art. 5º CF (Direitos Fundamentais)</li>
+                        <li>Teoria do Crime (Penal) - Nexo Causal</li>
+                        <li>Lei de Drogas (11.343/06) - arts. 33 e 28</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHECKLIST -->
+        <div class="card">
+            <div class="card-title">✅ Checklist de Combate (Semanal) <span class="badge" id="progressLabel">0%</span></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+            <div class="stats-row"><span id="checkCount">0 / 7</span><span>Meta: 100%</span></div>
+            <div class="checklist-grid" id="checklistContainer"></div>
+        </div>
+
+        <!-- CONTADORES -->
+        <div class="card">
+            <div class="card-title">📊 Questões Resolvidas</div>
+            <div class="quest-counter">
+                <div class="quest-box">
+                    <label>🥗 Almoço (10-15)</label>
+                    <div class="value" id="lunchCount">0</div>
+                    <div class="controls">
+                        <button onclick="adjustQuestions('lunch', -1)">-</button>
+                        <button onclick="adjustQuestions('lunch', 1)">+</button>
+                    </div>
+                </div>
+                <div class="quest-box">
+                    <label>🌙 Noite (Estudo)</label>
+                    <div class="value" id="nightCount">0</div>
+                    <div class="controls">
+                        <button onclick="adjustQuestions('night', -1)">-</button>
+                        <button onclick="adjustQuestions('night', 1)">+</button>
+                    </div>
+                </div>
+                <div class="quest-box" style="background:#1f2a1f; border:1px solid #2e8b57;">
+                    <label>🏃 TAF (Treinos)</label>
+                    <div class="value" id="tafCount">0</div>
+                    <div class="controls">
+                        <button onclick="adjustTAF(-1)">-</button>
+                        <button onclick="adjustTAF(1)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- METAS -->
+        <div class="card">
+            <div class="card-title">⚡ Ações do Dia</div>
+            <div class="meta-buttons">
+                <button class="btn-meta" id="btnSimulado" onclick="toggleMeta('simulado')">📝 Simulado</button>
+                <button class="btn-meta" id="btnRevisao" onclick="toggleMeta('revisao')">🔄 Revisão de Erros</button>
+                <button class="btn-meta" id="btnLeiSeca" onclick="toggleMeta('leiseca')">📖 Li a Lei Seca</button>
+            </div>
+            <div style="margin-top:12px; font-size:0.8rem; color:#8892a8;"><span id="metaStatus">Nenhuma meta concluída hoje</span></div>
+        </div>
+
+        <!-- MOTIVAÇÃO -->
+        <div class="card">
+            <div class="card-title">🔥 Motivação do Dia</div>
+            <div class="quote-box" id="motivationQuote">Carregando...<span>— Seu Mentor</span></div>
+        </div>
+
+        <div class="footer">PMPI 2026 • Dados salvos automaticamente no seu navegador.</div>
+    </div>
+
+    <script>
+        // =====================================================
+        // 1. DADOS DO PLANO DE ESTUDOS (SEMANAS)
+        // =====================================================
+        const studyPlan = [{
+            id: 1,
+            label: "Semana 1",
+            data: "23/06 a 29/06",
+            days: {
+                "Seg": "📘 Port: Interpretação + Crase\n⚖️ Rev: Lei Seca (Art. 144)",
+                "Ter": "📘 Port: Regência Verbal\n💻 Info: Word/Excel",
+                "Qua": "⚖️ Penal: Teoria do Crime\n🧠 RLM: Raciocínio Sequencial",
+                "Qui": "⚖️ Proc Penal: Inquérito Policial\n📰 Atualidades: Política PI",
+                "Sex": "📜 Legislação: Estatuto do Desarmamento\n🔄 Revisão: Erros",
+                "Sab": "🚀 Aprofundamento: Penal (Teoria do Crime)",
+                "Dom": "🏆 SIMULADO COMPLETO + Correção"
+            }
+        }, {
+            id: 2,
+            label: "Semana 2",
+            data: "30/06 a 06/07",
+            days: {
+                "Seg": "📘 Port: Sintaxe (Orações)\n⚖️ Rev: Art. 5º CF",
+                "Ter": "📘 Port: Concordância Verbal\n💻 Info: Segurança da Informação",
+                "Qua": "⚖️ Penal: Culpabilidade + Penas\n🧠 RLM: Proposições Lógicas",
+                "Qui": "⚖️ Proc Penal: Prisões\n📰 Atualidades: Economia",
+                "Sex": "📜 Legislação: Lei de Drogas\n🔄 Revisão: Erros",
+                "Sab": "🚀 Aprofundamento: Const (Art. 5º)",
+                "Dom": "🏆 SIMULADO COMPLETO + Correção"
+            }
+        }, {
+            id: 3,
+            label: "Semana 3",
+            data: "07/07 a 13/07",
+            days: {
+                "Seg": "📘 Port: Concordância Nominal\n⚖️ Rev: Adm Pública (CF)",
+                "Ter": "📘 Port: Pontuação\n💻 Info: Redes",
+                "Qua": "⚖️ Penal: Crimes Adm Pública\n🧠 RLM: Diagramas",
+                "Qui": "⚖️ Proc Penal: Ação Penal\n📰 Atualidades: Segurança",
+                "Sex": "📜 Legislação: Maria da Penha\n🔄 Revisão: Erros",
+                "Sab": "🚀 Aprofundamento: Penal (Crimes Adm)",
+                "Dom": "🏆 SIMULADO COMPLETO + Correção"
+            }
+        }, {
+            id: 4,
+            label: "Semana 4",
+            data: "14/07 a 20/07",
+            days: {
+                "Seg": "📘 Port: Interpretação Avançada\n⚖️ Rev: Art. 144",
+                "Ter": "📘 Port: Crase (Aprofundamento)\n💻 Info: Banco de Dados",
+                "Qua": "⚖️ Penal: Crimes Patrimônio\n🧠 RLM: Verdades/Mentiras",
+                "Qui": "⚖️ Proc Penal: Provas (Perícias)\n📰 Atualidades: Sociedade",
+                "Sex": "📜 Legislação: ECA\n🔄 Revisão: Erros",
+                "Sab": "🚀 Aprofundamento: Art. 144 CF",
+                "Dom": "🏆 SIMULADO COMPLETO + Correção"
+            }
+        }, {
+            id: 5,
+            label: "Semana 5",
+            data: "21/07 a 27/07",
+            days: {
+                "Seg": "📘 Port: Revisão Gramática\n⚖️ Rev: Direitos Sociais",
+                "Ter": "📘 Port: Redação Oficial\n💻 Info: Navegadores",
+                "Qua": "⚖️ Penal: Crimes Vida\n🧠 RLM: Raciocínio Matemático",
+                "Qui": "⚖️ Proc Penal: Recursos\n📰 Atualidades: Meio Ambiente",
+                "Sex": "📜 Legislação: Abuso de Autoridade\n🔄 Revisão: Erros",
+                "Sab": "🚀 Aprofundamento: Penal (Vida)",
+                "Dom": "🏆 SIMULADO COMPLETO + Correção"
+            }
+        }, {
+            id: 6,
+            label: "Semana 6",
+            data: "28/07 a 03/08",
+            days: {
+                "Seg": "📘 Port: REVISÃO Sintaxe\n⚖️ Rev: CF (Títulos I a V)",
+                "Ter": "📘 Port: REVISÃO Concordância\n💻 Info: Revisão Geral",
+                "Qua": "⚖️ Penal: REVISÃO Geral\n🧠 RLM: Revisão",
+                "Qui": "⚖️ Proc Penal: REVISÃO\n📰 Atualidades: Revisão",
+                "Sex": "📜 Legislação: REVISÃO\n🔄 Revisão: Erros",
+                "Sab": "🚀 REVISÃO GERAL",
+                "Dom": "🏆 SIMULADO COMPLETO + Correção"
+            }
+        }, {
+            id: 7,
+            label: "Semana 7",
+            data: "04/08 a 10/08",
+            days: {
+                "Seg": "📘 Port: Lei Seca\n⚖️ Rev: Decorebas (Art. 5/144)",
+                "Ter": "💻 Info: Excel Avançado\n🧠 RLM: Intensivo (200 Q)",
+                "Qua": "⚖️ Penal: Lei Seca (CP)\n🧠 RLM: Revisão",
+                "Qui": "⚖️ Proc Penal: Lei Seca (CPP)\n📰 Atualidades: Resumos",
+                "Sex": "📜 Legislação: Lei Seca\n🔄 Revisão: Erros",
+                "Sab": "🚀 SIMULADO INTERMEDIÁRIO",
+                "Dom": "🏆 SIMULADO COMPLETO + Correção"
+            }
+        }, {
+            id: 8,
+            label: "Semana 8",
+            data: "11/08 a 17/08",
+            days: {
+                "Seg": "🔁 Revisão: Português\n⚖️ Rev: Art. 144",
+                "Ter": "🔁 Revisão: Const/Info\n📊 RLM",
+                "Qua": "🔁 Revisão: Penal\n📊 Processual",
+                "Qui": "🔁 Revisão: Legislação\n📰 Atualidades",
+                "Sex": "🔁 Revisão Geral\n🔄 Lei Seca",
+                "Sab": "🚀 Desaceleração",
+                "Dom": "🏆 ÚLTIMO SIMULADO"
+            }
+        }, {
+            id: 9,
+            label: "Semana 9 (FINAL)",
+            data: "18/08 a 23/08",
+            days: {
+                "Seg": "📖 CF (Art. 5, 37, 144)\n🧠 RLM: 10 Q leves",
+                "Ter": "📖 CP (121, 155, 312)\n📖 CPP (4, 282)",
+                "Qua": "📖 Lei 11.343, 10.826\n📖 Maria da Penha",
+                "Qui": "📊 Caderno de Erros\n💻 Últimos tópicos",
+                "Sex": "📖 TODOS os artigos\n🧘 Respiração",
+                "Sab": "🛑 DESCANSO TOTAL",
+                "Dom": "🔴 DIA DA PROVA! VAI COM TUDO!"
+            }
+        }];
+
+        // =====================================================
+        // 2. FUNÇÕES DE DATA E FOCO DO DIA
+        // =====================================================
+        function getCurrentWeekIndex() {
+            const start = new Date(2026, 5, 23); // 23/06/2026
+            const today = new Date();
+            // Se hoje for antes do início, forçar semana 0
+            if (today < start) return 0;
+            const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+            let index = Math.floor(diffDays / 7);
+            if (index >= studyPlan.length) index = studyPlan.length - 1;
+            return index;
+        }
+
+        function getTodayStudyPlan() {
+            const weekIndex = getCurrentWeekIndex();
+            const week = studyPlan[weekIndex];
+            const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+            const today = new Date();
+            const dayName = daysOfWeek[today.getDay()]; // 0=Dom, 1=Seg...
+            // Se for Domingo, usa 'Dom'
+            let content = week.days[dayName];
+            if (!content) content = "📌 Dia de revisão leve ou descanso programado.";
+            return {
+                weekLabel: `${week.label} (${week.data})`,
+                day: dayName,
+                content: content
+            };
+        }
+
+        function renderFocusToday() {
+            const plan = getTodayStudyPlan();
+            document.getElementById('diaSemana').innerText = `Hoje é ${plan.day} - Foco total!`;
+            document.getElementById('assuntoDia').innerHTML = plan.content.replace(/\n/g, '<br>') + 
+                `<small>Baseado na ${plan.weekLabel}</small>`;
+            document.getElementById('semanaAtualLabel').innerText = plan.weekLabel;
+        }
+
+        // =====================================================
+        // 3. RENDER: PLANO DE ESTUDOS (ABAS)
+        // =====================================================
+        function renderStudyPlan() {
+            const nav = document.getElementById('tabNav');
+            const container = document.getElementById('tabContentContainer');
+            nav.innerHTML = '';
+            container.innerHTML = '';
+
+            const currentWeekIndex = getCurrentWeekIndex();
+
+            studyPlan.forEach((week, index) => {
+                const isActive = (index === currentWeekIndex);
+                const btn = document.createElement('button');
+                btn.className = `tab-btn ${isActive ? 'active' : ''}`;
+                btn.dataset.tab = `week-${week.id}`;
+                btn.innerText = `${week.label}`;
+                btn.onclick = () => switchTab(`week-${week.id}`);
+                nav.appendChild(btn);
+
+                const panel = document.createElement('div');
+                panel.className = `tab-panel ${isActive ? 'active' : ''}`;
+                panel.id = `week-${week.id}`;
+
+                let html = `
+                    <div class="semana-label">
+                        ${week.label} <small>${week.data}</small>
+                    </div>
+                    <div class="semana-grid">
+                `;
+                const daysOrder = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
+                daysOrder.forEach(day => {
+                    const content = week.days[day] || '📌 Revisão/Descanso';
+                    const isDom = day === 'Dom';
+                    const isSab = day === 'Sab';
+                    let cls = 'day-card';
+                    if (isDom) cls += ' domingo';
+                    if (isSab) cls += ' sabado';
+                    const formatted = content.replace(/\n/g, '<br>');
+                    html += `
+                        <div class="${cls}">
+                            <div class="dia">${day}</div>
+                            <div class="assunto">${formatted}</div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                panel.innerHTML = html;
+                container.appendChild(panel);
+            });
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabId);
+            });
+            document.querySelectorAll('.tab-panel').forEach(p => {
+                p.classList.toggle('active', p.id === tabId);
+            });
+        }
+
+        // =====================================================
+        // 4. TÉCNICAS (EXPANDIR)
+        // =====================================================
+        function toggleTecnica(el) {
+            el.classList.toggle('active');
+        }
+
+        // =====================================================
+        // 5. TIMER POMODORO
+        // =====================================================
+        let timerInterval = null;
+        let timerSeconds = 25 * 60;
+        let isRunning = false;
+        let currentMode = 'foco'; // 'foco' or 'pausa'
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('timerDisplay').innerText = 
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function setTimerMode(mode) {
+            if (isRunning) {
+                pauseTimer();
+            }
+            currentMode = mode;
+            document.getElementById('btnFoco').classList.toggle('active-mode', mode === 'foco');
+            document.getElementById('btnPausa').classList.toggle('active-mode', mode === 'pausa');
+            if (mode === 'foco') timerSeconds = 25 * 60;
+            else timerSeconds = 5 * 60;
+            updateTimerDisplay();
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            timerInterval = setInterval(() => {
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    alert('⏰ Tempo esgotado! Hora de pausa (ou voltar ao foco)!');
+                    // Alterna automaticamente entre foco e pausa? Vamos deixar o usuário decidir.
+                    return;
+                }
+                timerSeconds--;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            if (currentMode === 'foco') timerSeconds = 25 * 60;
+            else timerSeconds = 5 * 60;
+            updateTimerDisplay();
+        }
+
+        // =====================================================
+        // 6. SORTEIO DE TEMA
+        // =====================================================
+        function sortearTema() {
+            const temas = [
+                "📘 Português: CRASE - Faça 10 questões agora!",
+                "⚖️ Direito: Art. 144 CF - Decore as funções de cada polícia!",
+                "📘 Português: REGÊNCIA VERBAL - Revisão rápida!",
+                "⚖️ Direito: Art. 5º CF - Direitos Fundamentais (5 questões)",
+                "🧠 RLM: Diagramas Lógicos - Resolva 5 questões!",
+                "💻 Informática: Segurança da Informação - Leia 1 resumo.",
+                "📜 Legislação: Lei de Drogas (11.343) - Art. 33 e 28.",
+                "⚖️ Processo Penal: Inquérito Policial - Prazos e finalidades."
+            ];
+            const random = temas[Math.floor(Math.random() * temas.length)];
+            document.getElementById('sorteioResult').innerHTML = 
+                `🎯 Sorteado: <strong>${random}</strong>`;
+        }
+
+        // =====================================================
+        // 7. CHECKLIST, CONTADORES, METAS (LOCALSTORAGE)
+        // =====================================================
+        const CHECKLIST_ITENS = [
+            { id: 'seg', label: 'Segunda (Estudo + Almoço)', desc: 'Cumpri o cronograma de Segunda' },
+            { id: 'ter', label: 'Terça (Estudo + Almoço)', desc: 'Cumpri o cronograma de Terça' },
+            { id: 'qua', label: 'Quarta (Estudo + Almoço)', desc: 'Cumpri o cronograma de Quarta' },
+            { id: 'qui', label: 'Quinta (Estudo + Almoço)', desc: 'Cumpri o cronograma de Quinta' },
+            { id: 'sex', label: 'Sexta (Estudo + Almoço)', desc: 'Cumpri o cronograma de Sexta' },
+            { id: 'sab', label: 'Sábado (Aprofundamento)', desc: 'Cumpri o cronograma de Sábado' },
+            { id: 'dom', label: 'Domingo (SIMULADO)', desc: 'Cumpri o cronograma de Domingo' }
+        ];
+
+        function getStorage(key, defaultVal) {
+            const val = localStorage.getItem('pmpi_' + key);
+            if (val === null) return defaultVal;
+            try { return JSON.parse(val); } catch { return val; }
+        }
+        function setStorage(key, val) {
+            localStorage.setItem('pmpi_' + key, JSON.stringify(val));
+        }
+
+        let checklist = getStorage('checklist', {});
+        let lunchQ = getStorage('lunchQ', 0);
+        let nightQ = getStorage('nightQ', 0);
+        let tafQ = getStorage('tafQ', 0);
+        let metas = getStorage('metas', { simulado: false, revisao: false, leiseca: false });
+
+        function renderChecklist() {
+            const container = document.getElementById('checklistContainer');
+            container.innerHTML = '';
+            let checked = 0;
+            CHECKLIST_ITENS.forEach(item => {
+                const isChecked = checklist[item.id] || false;
+                if (isChecked) checked++;
+                const div = document.createElement('div');
+                div.className = `check-item ${isChecked ? 'done' : ''}`;
+                div.innerHTML = `
+                    <input type="checkbox" id="chk_${item.id}" ${isChecked ? 'checked' : ''} 
+                           onchange="toggleCheck('${item.id}')">
+                    <div class="info">${item.label}<small>${item.desc}</small></div>
+                `;
+                container.appendChild(div);
+            });
+            const pct = Math.round((checked / CHECKLIST_ITENS.length) * 100);
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressLabel').innerText = pct + '%';
+            document.getElementById('checkCount').innerText = `${checked} / ${CHECKLIST_ITENS.length}`;
+        }
+
+        function toggleCheck(id) {
+            checklist[id] = !checklist[id];
+            setStorage('checklist', checklist);
+            renderChecklist();
+        }
+
+        function renderCounters() {
+            document.getElementById('lunchCount').innerText = lunchQ;
+            document.getElementById('nightCount').innerText = nightQ;
+            document.getElementById('tafCount').innerText = tafQ;
+        }
+
+        function adjustQuestions(type, delta) {
+            if (type === 'lunch') { lunchQ = Math.max(0, lunchQ + delta); setStorage('lunchQ', lunchQ); } 
+            else { nightQ = Math.max(0, nightQ + delta); setStorage('nightQ', nightQ); }
+            renderCounters();
+        }
+
+        function adjustTAF(delta) {
+            tafQ = Math.max(0, tafQ + delta);
+            setStorage('tafQ', tafQ);
+            renderCounters();
+        }
+
+        function renderMetas() {
+            const btnSim = document.getElementById('btnSimulado');
+            const btnRev = document.getElementById('btnRevisao');
+            const btnLei = document.getElementById('btnLeiSeca');
+            const status = document.getElementById('metaStatus');
+            btnSim.classList.toggle('active', metas.simulado);
+            btnRev.classList.toggle('active', metas.revisao);
+            btnLei.classList.toggle('active', metas.leiseca);
+            const ativas = Object.values(metas).filter(v => v === true).length;
+            if (ativas === 0) status.innerText = 'Nenhuma meta concluída hoje';
+            else if (ativas === 1) status.innerText = '⚡ 1 meta concluída! Continue!';
+            else if (ativas === 2) status.innerText = '🔥 2 metas concluídas! Foco total!';
+            else status.innerText = '🏆 3 metas concluídas! Você é uma máquina!';
+        }
+
+        function toggleMeta(key) {
+            metas[key] = !metas[key];
+            setStorage('metas', metas);
+            renderMetas();
+        }
+
+        // =====================================================
+        // 8. MOTIVAÇÃO E COUNTDOWN
+        // =====================================================
+        const FRASES = [
+            "A dor do estudo é temporária, mas a farda e o orgulho da PMPI são para sempre.",
+            "Enquanto a concorrência descansa, você constrói o seu futuro. Foco, Soldado!",
+            "Cada questão errada hoje é uma vaga a mais garantida no dia da prova.",
+            "O cansaço das 22h é o preço que você paga pela sua liberdade e estabilidade.",
+            "Seu filho e sua família merecem esse esforço. Você é a inspiração deles.",
+            "A disciplina que você aplica hoje será a sua medalha amanhã."
+        ];
+
+        function renderMotivation() {
+            const idx = Math.floor(Math.random() * FRASES.length);
+            document.getElementById('motivationQuote').innerHTML = 
+                `"${FRASES[idx]}"<span>— Seu Mentor Digital</span>`;
+        }
+
+        function updateCountdown() {
+            const target = new Date('2026-08-23T23:59:59').getTime();
+            const now = new Date().getTime();
+            const diff = Math.max(0, target - now);
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('countdownDias').innerText = days;
+        }
+
+        // =====================================================
+        // 9. INICIALIZAÇÃO
+        // =====================================================
+        function init() {
+            renderStudyPlan();
+            renderFocusToday();
+            renderChecklist();
+            renderCounters();
+            renderMetas();
+            renderMotivation();
+            updateCountdown();
+            setTimerMode('foco');
+            setInterval(updateCountdown, 60000);
+        }
+
+        init();
+    </script>
+</body>
+</html>
