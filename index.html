@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>PMPI 2026 - Centro de Operações</title>
     <style>
+        /* (mantenha o mesmo CSS do seu arquivo, não alterei) */
         * {
             margin: 0;
             padding: 0;
@@ -26,7 +27,6 @@
             width: 100%;
         }
 
-        /* CABEÇALHO */
         .header {
             display: flex;
             justify-content: space-between;
@@ -77,7 +77,6 @@
             color: #8892a8;
         }
 
-        /* CARDS GERAIS */
         .card {
             background: #141b24;
             border-radius: 16px;
@@ -110,7 +109,6 @@
             border-radius: 20px;
         }
 
-        /* FOCO DO DIA (DESTAQUE) */
         .focus-today {
             background: #1f281f;
             border-left: 6px solid #2ecc71;
@@ -138,7 +136,6 @@
             display: block;
         }
 
-        /* TÉCNICAS + TIMER */
         .tecnicas-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -241,7 +238,6 @@
             border-color: #f5b301;
         }
 
-        /* SORTEIO */
         .sorteio-area {
             display: flex;
             align-items: center;
@@ -273,7 +269,6 @@
             color: #f5b301;
         }
 
-        /* PLANO DE ESTUDOS - ABAS */
         .tabs-nav {
             display: flex;
             gap: 8px;
@@ -403,7 +398,6 @@
             font-size: 0.7rem;
         }
 
-        /* FOCO A/C */
         .foco-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -442,7 +436,6 @@
             }
         }
 
-        /* CHECKLIST */
         .checklist-grid {
             display: flex;
             flex-direction: column;
@@ -510,7 +503,6 @@
             color: #8892a8;
         }
 
-        /* CONTADORES */
         .quest-counter {
             display: flex;
             gap: 15px;
@@ -559,7 +551,6 @@
             color: #0b0e14;
         }
 
-        /* METAS */
         .meta-buttons {
             display: flex;
             gap: 10px;
@@ -613,6 +604,14 @@
             padding: 20px 0 10px 0;
             border-top: 1px solid #1c232e;
             margin-top: 10px;
+        }
+
+        /* Novo indicador de data salva */
+        .save-indicator {
+            font-size: 0.7rem;
+            color: #2ecc71;
+            text-align: right;
+            margin-top: 4px;
         }
     </style>
 </head>
@@ -733,15 +732,19 @@
 
         <!-- CHECKLIST -->
         <div class="card">
-            <div class="card-title">✅ Checklist de Combate (Semanal) <span class="badge" id="progressLabel">0%</span></div>
+            <div class="card-title">✅ Checklist de Combate (Hoje) <span class="badge" id="progressLabel">0%</span></div>
             <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
-            <div class="stats-row"><span id="checkCount">0 / 7</span><span>Meta: 100%</span></div>
+            <div class="stats-row">
+                <span id="checkCount">0 / 7</span>
+                <span>Meta: 100%</span>
+            </div>
             <div class="checklist-grid" id="checklistContainer"></div>
+            <div class="save-indicator" id="saveIndicator">✅ Dados salvos para hoje</div>
         </div>
 
         <!-- CONTADORES -->
         <div class="card">
-            <div class="card-title">📊 Questões Resolvidas</div>
+            <div class="card-title">📊 Questões Resolvidas (Hoje)</div>
             <div class="quest-counter">
                 <div class="quest-box">
                     <label>🥗 Almoço (10-15)</label>
@@ -787,7 +790,7 @@
             <div class="quote-box" id="motivationQuote">Carregando...<span>— Seu Mentor</span></div>
         </div>
 
-        <div class="footer">PMPI 2026 • Dados salvos automaticamente no seu navegador.</div>
+        <div class="footer">PMPI 2026 • Dados salvos automaticamente para cada dia.</div>
     </div>
 
     <script>
@@ -919,7 +922,6 @@
         function getCurrentWeekIndex() {
             const start = new Date(2026, 5, 23); // 23/06/2026
             const today = new Date();
-            // Se hoje for antes do início, forçar semana 0
             if (today < start) return 0;
             const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
             let index = Math.floor(diffDays / 7);
@@ -932,8 +934,7 @@
             const week = studyPlan[weekIndex];
             const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
             const today = new Date();
-            const dayName = daysOfWeek[today.getDay()]; // 0=Dom, 1=Seg...
-            // Se for Domingo, usa 'Dom'
+            const dayName = daysOfWeek[today.getDay()];
             let content = week.days[dayName];
             if (!content) content = "📌 Dia de revisão leve ou descanso programado.";
             return {
@@ -1025,7 +1026,7 @@
         let timerInterval = null;
         let timerSeconds = 25 * 60;
         let isRunning = false;
-        let currentMode = 'foco'; // 'foco' or 'pausa'
+        let currentMode = 'foco';
 
         function updateTimerDisplay() {
             const mins = Math.floor(timerSeconds / 60);
@@ -1035,14 +1036,11 @@
         }
 
         function setTimerMode(mode) {
-            if (isRunning) {
-                pauseTimer();
-            }
+            if (isRunning) pauseTimer();
             currentMode = mode;
             document.getElementById('btnFoco').classList.toggle('active-mode', mode === 'foco');
             document.getElementById('btnPausa').classList.toggle('active-mode', mode === 'pausa');
-            if (mode === 'foco') timerSeconds = 25 * 60;
-            else timerSeconds = 5 * 60;
+            timerSeconds = (mode === 'foco') ? 25 * 60 : 5 * 60;
             updateTimerDisplay();
         }
 
@@ -1054,7 +1052,6 @@
                     clearInterval(timerInterval);
                     isRunning = false;
                     alert('⏰ Tempo esgotado! Hora de pausa (ou voltar ao foco)!');
-                    // Alterna automaticamente entre foco e pausa? Vamos deixar o usuário decidir.
                     return;
                 }
                 timerSeconds--;
@@ -1070,8 +1067,7 @@
         function resetTimer() {
             clearInterval(timerInterval);
             isRunning = false;
-            if (currentMode === 'foco') timerSeconds = 25 * 60;
-            else timerSeconds = 5 * 60;
+            timerSeconds = (currentMode === 'foco') ? 25 * 60 : 5 * 60;
             updateTimerDisplay();
         }
 
@@ -1095,76 +1091,123 @@
         }
 
         // =====================================================
-        // 7. CHECKLIST, CONTADORES, METAS (LOCALSTORAGE)
+        // 7. GERENCIAMENTO DE DADOS POR DATA (SOLUÇÃO DO PROBLEMA)
         // =====================================================
-        const CHECKLIST_ITENS = [
-            { id: 'seg', label: 'Segunda (Estudo + Almoço)', desc: 'Cumpri o cronograma de Segunda' },
-            { id: 'ter', label: 'Terça (Estudo + Almoço)', desc: 'Cumpri o cronograma de Terça' },
-            { id: 'qua', label: 'Quarta (Estudo + Almoço)', desc: 'Cumpri o cronograma de Quarta' },
-            { id: 'qui', label: 'Quinta (Estudo + Almoço)', desc: 'Cumpri o cronograma de Quinta' },
-            { id: 'sex', label: 'Sexta (Estudo + Almoço)', desc: 'Cumpri o cronograma de Sexta' },
-            { id: 'sab', label: 'Sábado (Aprofundamento)', desc: 'Cumpri o cronograma de Sábado' },
-            { id: 'dom', label: 'Domingo (SIMULADO)', desc: 'Cumpri o cronograma de Domingo' }
-        ];
+        const CHECKLIST_IDS = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
 
-        function getStorage(key, defaultVal) {
-            const val = localStorage.getItem('pmpi_' + key);
-            if (val === null) return defaultVal;
-            try { return JSON.parse(val); } catch { return val; }
-        }
-        function setStorage(key, val) {
-            localStorage.setItem('pmpi_' + key, JSON.stringify(val));
+        function getTodayKey() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         }
 
-        let checklist = getStorage('checklist', {});
-        let lunchQ = getStorage('lunchQ', 0);
-        let nightQ = getStorage('nightQ', 0);
-        let tafQ = getStorage('tafQ', 0);
-        let metas = getStorage('metas', { simulado: false, revisao: false, leiseca: false });
+        // Carrega os dados do dia atual (ou cria um novo)
+        function loadDailyData() {
+            const key = getTodayKey();
+            const stored = localStorage.getItem('pmpi_daily_' + key);
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch (e) {
+                    return createEmptyDailyData();
+                }
+            } else {
+                return createEmptyDailyData();
+            }
+        }
 
+        function createEmptyDailyData() {
+            const emptyChecklist = {};
+            CHECKLIST_IDS.forEach(id => emptyChecklist[id] = false);
+            return {
+                checklist: emptyChecklist,
+                lunchQ: 0,
+                nightQ: 0,
+                tafQ: 0,
+                metas: { simulado: false, revisao: false, leiseca: false }
+            };
+        }
+
+        // Salva os dados do dia atual
+        function saveDailyData(data) {
+            const key = getTodayKey();
+            localStorage.setItem('pmpi_daily_' + key, JSON.stringify(data));
+            document.getElementById('saveIndicator').innerText = `✅ Dados salvos para hoje (${key})`;
+        }
+
+        // Estado atual em memória
+        let dailyData = loadDailyData();
+
+        // =====================================================
+        // 8. RENDER: CHECKLIST, CONTADORES, METAS (usando dailyData)
+        // =====================================================
         function renderChecklist() {
             const container = document.getElementById('checklistContainer');
             container.innerHTML = '';
             let checked = 0;
-            CHECKLIST_ITENS.forEach(item => {
-                const isChecked = checklist[item.id] || false;
+
+            CHECKLIST_IDS.forEach(id => {
+                const isChecked = dailyData.checklist[id] || false;
                 if (isChecked) checked++;
+
                 const div = document.createElement('div');
                 div.className = `check-item ${isChecked ? 'done' : ''}`;
+                const labelMap = {
+                    'seg': 'Segunda (Estudo + Almoço)',
+                    'ter': 'Terça (Estudo + Almoço)',
+                    'qua': 'Quarta (Estudo + Almoço)',
+                    'qui': 'Quinta (Estudo + Almoço)',
+                    'sex': 'Sexta (Estudo + Almoço)',
+                    'sab': 'Sábado (Aprofundamento)',
+                    'dom': 'Domingo (SIMULADO)'
+                };
+                const descMap = {
+                    'seg': 'Cumpri o cronograma de Segunda',
+                    'ter': 'Cumpri o cronograma de Terça',
+                    'qua': 'Cumpri o cronograma de Quarta',
+                    'qui': 'Cumpri o cronograma de Quinta',
+                    'sex': 'Cumpri o cronograma de Sexta',
+                    'sab': 'Cumpri o cronograma de Sábado',
+                    'dom': 'Cumpri o cronograma de Domingo'
+                };
                 div.innerHTML = `
-                    <input type="checkbox" id="chk_${item.id}" ${isChecked ? 'checked' : ''} 
-                           onchange="toggleCheck('${item.id}')">
-                    <div class="info">${item.label}<small>${item.desc}</small></div>
+                    <input type="checkbox" id="chk_${id}" ${isChecked ? 'checked' : ''} 
+                           onchange="toggleCheck('${id}')">
+                    <div class="info">${labelMap[id]}<small>${descMap[id]}</small></div>
                 `;
                 container.appendChild(div);
             });
-            const pct = Math.round((checked / CHECKLIST_ITENS.length) * 100);
+
+            const pct = Math.round((checked / CHECKLIST_IDS.length) * 100);
             document.getElementById('progressFill').style.width = pct + '%';
             document.getElementById('progressLabel').innerText = pct + '%';
-            document.getElementById('checkCount').innerText = `${checked} / ${CHECKLIST_ITENS.length}`;
+            document.getElementById('checkCount').innerText = `${checked} / ${CHECKLIST_IDS.length}`;
         }
 
         function toggleCheck(id) {
-            checklist[id] = !checklist[id];
-            setStorage('checklist', checklist);
+            dailyData.checklist[id] = !dailyData.checklist[id];
+            saveDailyData(dailyData);
             renderChecklist();
         }
 
         function renderCounters() {
-            document.getElementById('lunchCount').innerText = lunchQ;
-            document.getElementById('nightCount').innerText = nightQ;
-            document.getElementById('tafCount').innerText = tafQ;
+            document.getElementById('lunchCount').innerText = dailyData.lunchQ;
+            document.getElementById('nightCount').innerText = dailyData.nightQ;
+            document.getElementById('tafCount').innerText = dailyData.tafQ;
         }
 
         function adjustQuestions(type, delta) {
-            if (type === 'lunch') { lunchQ = Math.max(0, lunchQ + delta); setStorage('lunchQ', lunchQ); } 
-            else { nightQ = Math.max(0, nightQ + delta); setStorage('nightQ', nightQ); }
+            if (type === 'lunch') {
+                dailyData.lunchQ = Math.max(0, dailyData.lunchQ + delta);
+            } else {
+                dailyData.nightQ = Math.max(0, dailyData.nightQ + delta);
+            }
+            saveDailyData(dailyData);
             renderCounters();
         }
 
         function adjustTAF(delta) {
-            tafQ = Math.max(0, tafQ + delta);
-            setStorage('tafQ', tafQ);
+            dailyData.tafQ = Math.max(0, dailyData.tafQ + delta);
+            saveDailyData(dailyData);
             renderCounters();
         }
 
@@ -1173,10 +1216,12 @@
             const btnRev = document.getElementById('btnRevisao');
             const btnLei = document.getElementById('btnLeiSeca');
             const status = document.getElementById('metaStatus');
-            btnSim.classList.toggle('active', metas.simulado);
-            btnRev.classList.toggle('active', metas.revisao);
-            btnLei.classList.toggle('active', metas.leiseca);
-            const ativas = Object.values(metas).filter(v => v === true).length;
+
+            btnSim.classList.toggle('active', dailyData.metas.simulado);
+            btnRev.classList.toggle('active', dailyData.metas.revisao);
+            btnLei.classList.toggle('active', dailyData.metas.leiseca);
+
+            const ativas = Object.values(dailyData.metas).filter(v => v === true).length;
             if (ativas === 0) status.innerText = 'Nenhuma meta concluída hoje';
             else if (ativas === 1) status.innerText = '⚡ 1 meta concluída! Continue!';
             else if (ativas === 2) status.innerText = '🔥 2 metas concluídas! Foco total!';
@@ -1184,13 +1229,13 @@
         }
 
         function toggleMeta(key) {
-            metas[key] = !metas[key];
-            setStorage('metas', metas);
+            dailyData.metas[key] = !dailyData.metas[key];
+            saveDailyData(dailyData);
             renderMetas();
         }
 
         // =====================================================
-        // 8. MOTIVAÇÃO E COUNTDOWN
+        // 9. MOTIVAÇÃO E COUNTDOWN
         // =====================================================
         const FRASES = [
             "A dor do estudo é temporária, mas a farda e o orgulho da PMPI são para sempre.",
@@ -1216,11 +1261,13 @@
         }
 
         // =====================================================
-        // 9. INICIALIZAÇÃO
+        // 10. INICIALIZAÇÃO
         // =====================================================
         function init() {
             renderStudyPlan();
             renderFocusToday();
+            // Carrega dados do dia
+            dailyData = loadDailyData();
             renderChecklist();
             renderCounters();
             renderMetas();
